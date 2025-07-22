@@ -35,7 +35,7 @@
     {
       "parameters": {
         "userKey": "ub7a9rfswai1bp13yxsom272dhb5e3",
-        "message": "=Workflow failed with error: {{ $json.execution.error.message }}",
+        "message": "=Workflow \"{{ $json.workflow.name }}\" failed with error: {{ $json.execution.error.message }}",
         "priority": -1,
         "additionalFields": {}
       },
@@ -65,6 +65,6 @@
   "staticData": null,
   "tags": [],
   "triggerCount": 0,
-  "updatedAt": "2025-07-21T08:05:02.000Z",
-  "versionId": "e280ab17-ec70-4ffb-a9b2-20b586432a9e"
+  "updatedAt": "2025-07-22T17:22:43.000Z",
+  "versionId": "eeb16d93-6977-487a-97e3-c5f7f1b323a5"
 }
