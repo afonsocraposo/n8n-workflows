@@ -1,0 +1,70 @@
+{
+  "active": false,
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Push a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2025-07-21T08:00:03.264Z",
+  "id": "ga66cR631VA0DsyT",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "Send pushover notification with error",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "d374729c-238e-469f-905a-f17fafa9cf97",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "userKey": "ub7a9rfswai1bp13yxsom272dhb5e3",
+        "message": "=Workflow failed with error: {{ $json.execution.error.message }}",
+        "priority": -1,
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.pushover",
+      "typeVersion": 1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "ef229765-a47f-47a3-be23-75fb5b456ea8",
+      "name": "Push a message",
+      "credentials": {
+        "pushoverApi": {
+          "id": "XJv8Oy4HNCNifU8K",
+          "name": "Pushover account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "repo_name": "n8n-workflows",
+  "repo_owner": "afonsocraposo",
+  "repo_path": "",
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2025-07-21T08:05:02.000Z",
+  "versionId": "e280ab17-ec70-4ffb-a9b2-20b586432a9e"
+}
