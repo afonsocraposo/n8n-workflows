@@ -165,7 +165,7 @@
             {
               "id": "d0a7f5c6-c1f2-4a5a-92e5-5f385858bac3",
               "name": "snippet.day",
-              "value": "={{ $json.snippet.title.match(/Day ([0-9]*)/)?.last() }}",
+              "value": "={{ $json.snippet.title.match(/Day ([0-9]*)/)?.last() || 50 }}",
               "type": "number"
             }
           ]
@@ -213,7 +213,7 @@
       "parameters": {
         "conditions": {
           "options": {
-            "caseSensitive": true,
+            "caseSensitive": false,
             "leftValue": "",
             "typeValidation": "strict",
             "version": 2
@@ -222,7 +222,7 @@
             {
               "id": "61c0be28-df1c-4ce3-9295-a1b721f71aa9",
               "leftValue": "={{ $json.snippet.title }}",
-              "rightValue": "I Visited 50 States in 50 Days",
+              "rightValue": "50 States in 50 Days",
               "operator": {
                 "type": "string",
                 "operation": "contains"
@@ -240,7 +240,9 @@
           ],
           "combinator": "and"
         },
-        "options": {}
+        "options": {
+          "ignoreCase": true
+        }
       },
       "type": "n8n-nodes-base.filter",
       "typeVersion": 2.2,
@@ -351,6 +353,6 @@
   },
   "tags": [],
   "triggerCount": 1,
-  "updatedAt": "2025-07-21T08:05:43.000Z",
-  "versionId": "caa400ff-2e5e-4ed0-a8ac-42b06a1e38d3"
+  "updatedAt": "2025-07-29T16:43:13.000Z",
+  "versionId": "e63bd94a-523a-45b6-8358-f5bf60bd1575"
 }
