@@ -1,5 +1,120 @@
 {
-  "active": false,
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2025-12-20T10:28:42.611Z",
+    "createdAt": "2025-12-20T10:28:42.611Z",
+    "versionId": "d1086682-333b-429d-85c8-b117af17ad30",
+    "workflowId": "DKFjR3CjNye2CYLy",
+    "nodes": [
+      {
+        "parameters": {
+          "executeOnce": true,
+          "command": "find \"/tmp/I Tried the Top 50 Airbnbs in America by Ryan Trahan\" -type f -name \"*.mp4\" -exec mv {} \"/youtube/I Tried the Top 50 Airbnbs in America by Ryan Trahan\" \\+"
+        },
+        "type": "n8n-nodes-base.executeCommand",
+        "typeVersion": 1,
+        "position": [
+          1568,
+          -160
+        ],
+        "id": "bcad66af-b5e6-44fc-82c6-1d072a52b3b5",
+        "name": "Move to destination"
+      },
+      {
+        "parameters": {
+          "splitInBatchesNotice": "",
+          "batchSize": 1,
+          "options": {}
+        },
+        "type": "n8n-nodes-base.splitInBatches",
+        "typeVersion": 3,
+        "position": [
+          1120,
+          -160
+        ],
+        "id": "268a075b-7c36-475e-a738-a4035cf7f772",
+        "name": "Loop Over Items"
+      },
+      {
+        "parameters": {
+          "executeOnce": false,
+          "command": "=yt-dlp --output \"I Tried the Top 50 Airbnbs in America E{{$json.snippet.day.toString().padStart(3, '0')}}.%(ext)s\" --continue --embed-thumbnail --add-metadata -S res:1080,ext:mp4:m4a --recode mp4 -P \"/tmp/I Tried the Top 50 Airbnbs in America by Ryan Trahan\" https://www.youtube.com/watch?v={{ $json.id.videoId }}"
+        },
+        "type": "n8n-nodes-base.executeCommand",
+        "typeVersion": 1,
+        "position": [
+          1344,
+          -240
+        ],
+        "id": "f32760bf-fab9-4b2e-99ee-1dcafc2c7da8",
+        "name": "yt-dlp"
+      },
+      {
+        "id": "ac989db3-f543-488b-a54f-2ca455c4a615",
+        "typeVersion": 1.1,
+        "name": "Start",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "position": [
+          912,
+          -160
+        ],
+        "parameters": {
+          "inputSource": "passthrough"
+        }
+      }
+    ],
+    "connections": {
+      "yt-dlp": {
+        "main": [
+          [
+            {
+              "node": "Move to destination",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Loop Over Items": {
+        "main": [
+          [],
+          [
+            {
+              "node": "yt-dlp",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Move to destination": {
+        "main": [
+          [
+            {
+              "node": "Loop Over Items",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Start": {
+        "main": [
+          [
+            {
+              "node": "Loop Over Items",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "system migration",
+    "name": null,
+    "description": null
+  },
+  "activeVersionId": "d1086682-333b-429d-85c8-b117af17ad30",
   "connections": {
     "yt-dlp": {
       "main": [
@@ -117,6 +232,15 @@
   "settings": {
     "executionOrder": "v1"
   },
+  "shared": [
+    {
+      "updatedAt": "2025-07-29T16:35:24.545Z",
+      "createdAt": "2025-07-29T16:35:24.545Z",
+      "role": "workflow:owner",
+      "workflowId": "DKFjR3CjNye2CYLy",
+      "projectId": "fuqA7U1sSqEJpbZd"
+    }
+  ],
   "staticData": null,
   "tags": [],
   "triggerCount": 0,
