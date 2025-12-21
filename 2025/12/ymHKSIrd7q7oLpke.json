@@ -1,0 +1,549 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Generate request id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Filename",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload output video": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload input image": {
+      "main": [
+        [
+          {
+            "node": "Generate video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filename": {
+      "main": [
+        [
+          {
+            "node": "Upload input image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate video": {
+      "main": [
+        [
+          {
+            "node": "Check generation status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check generation status": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch generated video": {
+      "main": [
+        [
+          {
+            "node": "Upload output video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map videos from form": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate request id": {
+      "main": [
+        [
+          {
+            "node": "Map videos from form",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 10s": {
+      "main": [
+        [
+          {
+            "node": "Check generation status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get 1080p video": {
+      "main": [
+        [
+          {
+            "node": "Fetch generated video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Get 1080p video",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait 10s",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2025-12-20T10:20:43.886Z",
+  "id": "ymHKSIrd7q7oLpke",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "Generate AI Life Video",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Upload photos",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Photos",
+              "fieldType": "file",
+              "acceptFileTypes": ".jpg, .png, .jpeg",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Comment"
+            },
+            {
+              "fieldLabel": "Format",
+              "fieldType": "dropdown",
+              "defaultValue": "9:16",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "9:16"
+                  },
+                  {
+                    "option": "16:9"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -368,
+        248
+      ],
+      "id": "3017054b-6313-477a-9473-c8ce75385ad7",
+      "name": "On form submission",
+      "webhookId": "d16f6d5d-147e-4398-ab04-9277bea7fd2f"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        304,
+        248
+      ],
+      "id": "c5ef7a7c-61ee-495c-9968-1bd5a2bb1356",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "afonsocraposo",
+        "fileName": "=life-ai/output/{{$('Filename').item.json.filename}}.{{ $binary.data.fileExtension }}",
+        "additionalFields": {
+          "acl": "publicRead"
+        }
+      },
+      "type": "n8n-nodes-base.s3",
+      "typeVersion": 1,
+      "position": [
+        2096,
+        56
+      ],
+      "id": "63422c7d-57e1-43c5-839b-f40b0af62970",
+      "name": "Upload output video",
+      "credentials": {
+        "s3": {
+          "id": "W3MJn0cHyQWwqW1E",
+          "name": "Hetzner"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "afonsocraposo",
+        "fileName": "=life-ai/input/{{ $('Filename').item.json.filenameImage }}",
+        "binaryPropertyName": "={{ $('Loop Over Items').item.binary.data}}",
+        "additionalFields": {
+          "acl": "publicRead"
+        }
+      },
+      "type": "n8n-nodes-base.s3",
+      "typeVersion": 1,
+      "position": [
+        752,
+        -16
+      ],
+      "id": "14744101-29e8-442b-a88a-d05db49574d8",
+      "name": "Upload input image",
+      "credentials": {
+        "s3": {
+          "id": "W3MJn0cHyQWwqW1E",
+          "name": "Hetzner"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"filenameImage\": {{ $('Generate request id').item.json.requestId }}_{{ $json['index'] }}.{{$binary.data.fileExtension}},\n\"filename\": {{ $('Generate request id').item.json.requestId }}_{{ $json['index'] }}\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        528,
+        -16
+      ],
+      "id": "ad2ad320-766a-43c7-b6b2-5ad689ab4fb5",
+      "name": "Filename"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://veo3api.com/generate",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"veo3-fast\",\n  \"prompt\": \"Animate this photo in a lifelike and emotionally accurate way while strictly preserving the original photographic style and identity. The visual style of the image must remain unchanged throughout the entire video. Do not stylize, enhance, modernize, beautify, repaint, reinterpret, or artistically alter the image in any way. Preserve the original camera look, lens characteristics, depth of field, grain or noise, sharpness, contrast, color balance, lighting direction, shadows, and overall mood exactly as they appear in the source photo. All faces must remain an exact match to the original photo at all times. Do not alter facial structure, proportions, age, skin texture, or expressions beyond minimal, natural motion. If maintaining identity and style conflicts with motion realism, reduce or limit movement rather than changing appearance. Add only subtle, context-appropriate movement that fits the scene (for example: a wedding couple sharing a brief, gentle kiss, or family members expressing shared happiness through small smiles and eye movements). No new actions, people, poses, or background elements may be introduced. The animation should feel like the same photograph briefly coming to life — emotionally warm, joyful, and respectful — without any change in artistic or photographic style. Bear in mind that: {{ $('On form submission').item.json.Comment }}\",\n  \"image_urls\": [\"https://nbg1.your-objectstorage.com/afonsocraposo/life-ai/input/{{ $('Filename').item.json.filenameImage}}\"],\n  \"aspect_ratio\": \"{{ $('On form submission').item.json.Format }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        976,
+        -16
+      ],
+      "id": "83b7c762-73d5-466f-9e40-c4129119adac",
+      "name": "Generate video",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "cTXAUUTqeDV0q5qf",
+          "name": "veo3api"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://veo3api.com/feed",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "task_id",
+              "value": "={{ $('Generate video').item.json.data.task_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1200,
+        -16
+      ],
+      "id": "d147bf52-778c-41a6-9878-fb73dfd0169d",
+      "name": "Check generation status",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "cTXAUUTqeDV0q5qf",
+          "name": "veo3api"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.data.result_url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1872,
+        -144
+      ],
+      "id": "852a0764-f763-4950-badd-c05ab5033e6c",
+      "name": "Fetch generated video"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json\nconst binaryData = $input.first().binary\n\nlet output = []\n\nObject.keys(binaryData).forEach( (b, index) => {\n  output.push({\n    json: {...data.Photos.at(index), index},\n    binary: { data: binaryData[b]}\n  })\n})\n\nreturn output"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        80,
+        248
+      ],
+      "id": "a8d139ec-069c-442a-92e6-f231e859320a",
+      "name": "Map videos from form"
+    },
+    {
+      "parameters": {
+        "action": "generate",
+        "dataPropertyName": "requestId"
+      },
+      "type": "n8n-nodes-base.crypto",
+      "typeVersion": 1,
+      "position": [
+        -144,
+        248
+      ],
+      "id": "500639f1-b984-4c35-8dff-7a7556574df1",
+      "name": "Generate request id"
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1648,
+        80
+      ],
+      "id": "3181999d-8f6a-4a98-941e-bf99f0f79667",
+      "name": "Wait 10s",
+      "webhookId": "15290506-f351-49d1-b6e7-a22e1affdb45"
+    },
+    {
+      "parameters": {
+        "url": "https://veo3api.com/get-1080p",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "task_id",
+              "value": "={{ $('Generate video').item.json.data.task_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1648,
+        -144
+      ],
+      "id": "7594229c-671f-4a93-87c1-db8a62d86d06",
+      "name": "Get 1080p video",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "cTXAUUTqeDV0q5qf",
+          "name": "veo3api"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.data.status }}",
+                    "rightValue": "COMPLETED",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "335eed46-726e-425c-9d96-dcc94256c432"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "completed"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "871d8729-40fa-4bf5-b395-10bad03f1880",
+                    "leftValue": "={{ $json.data.status }}",
+                    "rightValue": "FAILED",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "failed"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "99dd64d6-f7dd-482a-831c-059b6084046e",
+                    "leftValue": "={{ $json.data.status }}",
+                    "rightValue": "IN_PROGRESS",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "in_progress"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        1424,
+        -112
+      ],
+      "id": "5f8cd551-9c44-49fe-9700-a9a1b5871b12",
+      "name": "Switch"
+    }
+  ],
+  "pinData": {},
+  "repo_name": "n8n-workflows",
+  "repo_owner": "afonsocraposo",
+  "repo_path": "",
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [
+    {
+      "updatedAt": "2025-12-20T10:20:43.900Z",
+      "createdAt": "2025-12-20T10:20:43.900Z",
+      "role": "workflow:owner",
+      "workflowId": "ymHKSIrd7q7oLpke",
+      "projectId": "fuqA7U1sSqEJpbZd"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2025-12-21T00:39:00.944Z",
+  "versionId": "d683f816-2f85-4c2c-a935-bd097e71041b"
+}
