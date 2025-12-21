@@ -1,5 +1,332 @@
 {
   "active": true,
+  "activeVersion": {
+    "updatedAt": "2025-12-20T10:28:42.611Z",
+    "createdAt": "2025-12-20T10:28:42.611Z",
+    "versionId": "c1cf5655-5271-4909-b91a-c91f0aad1a59",
+    "workflowId": "5qrmO1Y9kJuQLPsH",
+    "nodes": [
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {}
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          -208,
+          0
+        ],
+        "id": "c865af57-ab72-4517-b650-d6b41782e9a5",
+        "name": "Schedule Trigger"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "67bf7f0b-be16-42bd-a84c-5d0ced8e95e7",
+                "name": "id.videoId",
+                "value": "={{ $json.id.videoId }}",
+                "type": "string"
+              },
+              {
+                "id": "5048d036-b098-4afa-9e37-d3dc74f9e052",
+                "name": "snippet.title",
+                "value": "={{ $json.snippet.title }}",
+                "type": "string"
+              },
+              {
+                "id": "c517d9fb-4ffd-4a23-948d-1c828d00e325",
+                "name": "snippet.publishedAt",
+                "value": "={{ $json.snippet.publishedAt }}",
+                "type": "string"
+              },
+              {
+                "id": "d0a7f5c6-c1f2-4a5a-92e5-5f385858bac3",
+                "name": "snippet.episode",
+                "value": "={{ $json.snippet.title.match(/Episódio ([0-9]*)/)?.last() }}",
+                "type": "number"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          464,
+          -96
+        ],
+        "id": "c42e71f5-028b-4281-a3d6-1088ff867f7a",
+        "name": "Extract fields"
+      },
+      {
+        "parameters": {
+          "executeOnce": false,
+          "command": "=yt-dlp --output \"%(title)s.%(ext)s\" --no-overwrites --continue --ignore-errors --embed-thumbnail --add-metadata -S res:1080,ext:mp4:m4a --recode mp4 -P \"/tmp/shin-chan\" https://www.youtube.com/watch?v={{ $json.id.videoId }}"
+        },
+        "type": "n8n-nodes-base.executeCommand",
+        "typeVersion": 1,
+        "position": [
+          1360,
+          -168
+        ],
+        "id": "d5e80907-0ed7-4c98-bc62-c68849a3a937",
+        "name": "yt-dlp"
+      },
+      {
+        "parameters": {
+          "command": "ls \"/series/shin-chan\" | grep -oE 'Episódio [0-9]+' | sed 's/Episódio//' | sort -n | tail -n 1"
+        },
+        "type": "n8n-nodes-base.executeCommand",
+        "typeVersion": 1,
+        "position": [
+          16,
+          -96
+        ],
+        "id": "3809d4b0-e5e9-492f-8f6d-b408a8cfcc35",
+        "name": "Last downloaded episode number",
+        "executeOnce": true
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "62810f43-e41d-4427-9dbd-0cabad9862be",
+                "leftValue": "={{ $json.snippet.episode }}",
+                "rightValue": "={{ $('Last downloaded episode number').item.json.stdout.toNumber() }}",
+                "operator": {
+                  "type": "number",
+                  "operation": "gt"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.filter",
+        "typeVersion": 2.2,
+        "position": [
+          688,
+          -96
+        ],
+        "id": "e244dcb5-327c-4ccf-96a3-38fa28af365a",
+        "name": "Get videos to download"
+      },
+      {
+        "parameters": {
+          "sortFieldsUi": {
+            "sortField": [
+              {
+                "fieldName": "snippet.episode"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.sort",
+        "typeVersion": 1,
+        "position": [
+          912,
+          -96
+        ],
+        "id": "94fb3497-243e-44a4-8ee3-ac45d606638c",
+        "name": "Sort"
+      },
+      {
+        "parameters": {
+          "resource": "video",
+          "limit": 7,
+          "filters": {
+            "channelId": "UCObj1J7BoxnGJLE2V0VQ9tQ"
+          },
+          "options": {
+            "order": "date"
+          }
+        },
+        "type": "n8n-nodes-base.youTube",
+        "typeVersion": 1,
+        "position": [
+          240,
+          -96
+        ],
+        "id": "55af8aaa-e487-4397-91b6-e3ce33f8ee78",
+        "name": "Get last Shin Chan videos",
+        "credentials": {
+          "youTubeOAuth2Api": {
+            "id": "MQugWyBjZ5BJbmTw",
+            "name": "YouTube account"
+          }
+        }
+      },
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.manualTrigger",
+        "typeVersion": 1,
+        "position": [
+          -208,
+          -192
+        ],
+        "id": "32f83deb-0edc-42c7-92a6-a3042ed9d860",
+        "name": "When clicking ‘Execute workflow’"
+      },
+      {
+        "parameters": {
+          "options": {}
+        },
+        "type": "n8n-nodes-base.splitInBatches",
+        "typeVersion": 3,
+        "position": [
+          1136,
+          -96
+        ],
+        "id": "85088c87-c7f4-4a9e-b1c8-487fe9717132",
+        "name": "Loop Over Items"
+      },
+      {
+        "parameters": {
+          "command": "find \"/tmp/shin-chan\" -type f -name \"*.mp4\" -exec mv {} \"/series/shin-chan\" \\+"
+        },
+        "type": "n8n-nodes-base.executeCommand",
+        "typeVersion": 1,
+        "position": [
+          1584,
+          -96
+        ],
+        "id": "5681b317-299d-44a3-b0fc-13d4bdc4fb16",
+        "name": "Execute Command"
+      }
+    ],
+    "connections": {
+      "Schedule Trigger": {
+        "main": [
+          [
+            {
+              "node": "Last downloaded episode number",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Extract fields": {
+        "main": [
+          [
+            {
+              "node": "Get videos to download",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Last downloaded episode number": {
+        "main": [
+          [
+            {
+              "node": "Get last Shin Chan videos",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get videos to download": {
+        "main": [
+          [
+            {
+              "node": "Sort",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Sort": {
+        "main": [
+          [
+            {
+              "node": "Loop Over Items",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get last Shin Chan videos": {
+        "main": [
+          [
+            {
+              "node": "Extract fields",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "When clicking ‘Execute workflow’": {
+        "main": [
+          [
+            {
+              "node": "Last downloaded episode number",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "yt-dlp": {
+        "main": [
+          [
+            {
+              "node": "Execute Command",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Loop Over Items": {
+        "main": [
+          [],
+          [
+            {
+              "node": "yt-dlp",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Execute Command": {
+        "main": [
+          [
+            {
+              "node": "Loop Over Items",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "system migration",
+    "name": null,
+    "description": null
+  },
+  "activeVersionId": "c1cf5655-5271-4909-b91a-c91f0aad1a59",
   "connections": {
     "Schedule Trigger": {
       "main": [
@@ -333,6 +660,15 @@
     "callerPolicy": "workflowsFromSameOwner",
     "errorWorkflow": "ga66cR631VA0DsyT"
   },
+  "shared": [
+    {
+      "updatedAt": "2025-07-17T18:19:04.259Z",
+      "createdAt": "2025-07-17T18:19:04.259Z",
+      "role": "workflow:owner",
+      "workflowId": "5qrmO1Y9kJuQLPsH",
+      "projectId": "fuqA7U1sSqEJpbZd"
+    }
+  ],
   "staticData": {
     "node:Schedule Trigger": {
       "recurrenceRules": []
