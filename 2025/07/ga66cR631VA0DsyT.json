@@ -1,5 +1,63 @@
 {
-  "active": false,
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2025-12-20T10:28:42.611Z",
+    "createdAt": "2025-12-20T10:28:42.611Z",
+    "versionId": "eeb16d93-6977-487a-97e3-c5f7f1b323a5",
+    "workflowId": "ga66cR631VA0DsyT",
+    "nodes": [
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.errorTrigger",
+        "typeVersion": 1,
+        "position": [
+          0,
+          0
+        ],
+        "id": "d374729c-238e-469f-905a-f17fafa9cf97",
+        "name": "Error Trigger"
+      },
+      {
+        "parameters": {
+          "userKey": "ub7a9rfswai1bp13yxsom272dhb5e3",
+          "message": "=Workflow \"{{ $json.workflow.name }}\" failed with error: {{ $json.execution.error.message }}",
+          "priority": -1,
+          "additionalFields": {}
+        },
+        "type": "n8n-nodes-base.pushover",
+        "typeVersion": 1,
+        "position": [
+          208,
+          0
+        ],
+        "id": "ef229765-a47f-47a3-be23-75fb5b456ea8",
+        "name": "Push a message",
+        "credentials": {
+          "pushoverApi": {
+            "id": "XJv8Oy4HNCNifU8K",
+            "name": "Pushover account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Error Trigger": {
+        "main": [
+          [
+            {
+              "node": "Push a message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "system migration",
+    "name": null,
+    "description": null
+  },
+  "activeVersionId": "eeb16d93-6977-487a-97e3-c5f7f1b323a5",
   "connections": {
     "Error Trigger": {
       "main": [
@@ -62,6 +120,15 @@
   "settings": {
     "executionOrder": "v1"
   },
+  "shared": [
+    {
+      "updatedAt": "2025-07-21T08:00:03.274Z",
+      "createdAt": "2025-07-21T08:00:03.274Z",
+      "role": "workflow:owner",
+      "workflowId": "ga66cR631VA0DsyT",
+      "projectId": "fuqA7U1sSqEJpbZd"
+    }
+  ],
   "staticData": null,
   "tags": [],
   "triggerCount": 0,
