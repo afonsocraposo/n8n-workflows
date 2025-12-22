@@ -1,0 +1,168 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "ffmpeg",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ffmpeg": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk": {
+      "main": [
+        [
+          {
+            "node": "Upload output video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2025-12-21T10:50:02.986Z",
+  "id": "RrvcXiJEhu9mOYoo",
+  "isArchived": false,
+  "meta": null,
+  "name": "Join videos",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Submit videos",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Videos (URL)",
+              "fieldType": "textarea",
+              "placeholder": "https://video1.com, https://video2.com, https://video3.com",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "e4d48ecf-9ae8-4071-890f-d4b33eb54631",
+      "name": "On form submission",
+      "webhookId": "c78dd160-0f47-4531-a341-2d31efc0c0dd"
+    },
+    {
+      "parameters": {
+        "jsCode": "const urlsString = $input.first().json['Videos (URL)']\nconst urls = urlsString.trim().split(\",\").map((url)=>url.trim())\nconst ffmpegInput = urls.map((url)=>`-i ${url}`).join(\" \")\nreturn {\n  urlsString,\n  urls,\n  ffmpegInput\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "62a72e4d-6eda-4d76-8029-8ac11ad08add",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "fileSelector": "/tmp/output.mp4",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        624,
+        0
+      ],
+      "id": "41485f31-4a6d-4daa-a3ff-ab43e32d0f30",
+      "name": "Read/Write Files from Disk"
+    },
+    {
+      "parameters": {
+        "command": "=ffmpeg  {{ $json.ffmpegInput }} -f concat -safe 0 -i inputs.txt -c copy -y /tmp/output.mp4"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        416,
+        0
+      ],
+      "id": "481cbd8b-69f0-4daa-8a47-6af9d38a89fb",
+      "name": "ffmpeg"
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "afonsocraposo",
+        "fileName": "=life-ai/output/joined.{{ $binary.data.fileExtension }}",
+        "additionalFields": {
+          "acl": "publicRead"
+        }
+      },
+      "type": "n8n-nodes-base.s3",
+      "typeVersion": 1,
+      "position": [
+        848,
+        0
+      ],
+      "id": "f36c8324-5c0a-4613-ab87-4d1f13b09573",
+      "name": "Upload output video",
+      "credentials": {
+        "s3": {
+          "id": "W3MJn0cHyQWwqW1E",
+          "name": "Hetzner"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "repo_name": "n8n-workflows",
+  "repo_owner": "afonsocraposo",
+  "repo_path": "",
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [
+    {
+      "updatedAt": "2025-12-21T10:50:02.989Z",
+      "createdAt": "2025-12-21T10:50:02.989Z",
+      "role": "workflow:owner",
+      "workflowId": "RrvcXiJEhu9mOYoo",
+      "projectId": "fuqA7U1sSqEJpbZd"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2025-12-21T11:10:41.685Z",
+  "versionId": "308f803d-120b-4996-813a-aa511442868c"
+}
