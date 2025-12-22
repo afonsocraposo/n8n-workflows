@@ -7,19 +7,7 @@
       "main": [
         [
           {
-            "node": "Generate request id",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Loop Over Items": {
-      "main": [
-        [],
-        [
-          {
-            "node": "Filename",
+            "node": "Split Out",
             "type": "main",
             "index": 0
           }
@@ -28,13 +16,7 @@
     },
     "Upload output video": {
       "main": [
-        [
-          {
-            "node": "Loop Over Items",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        []
       ]
     },
     "Upload input image": {
@@ -74,29 +56,7 @@
       "main": [
         [
           {
-            "node": "Switch",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Fetch generated video": {
-      "main": [
-        [
-          {
-            "node": "Upload output video",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Map videos from form": {
-      "main": [
-        [
-          {
-            "node": "Loop Over Items",
+            "node": "Is Ready?",
             "type": "main",
             "index": 0
           }
@@ -107,7 +67,7 @@
       "main": [
         [
           {
-            "node": "Map videos from form",
+            "node": "Filename",
             "type": "main",
             "index": 0
           }
@@ -125,29 +85,11 @@
         ]
       ]
     },
-    "Get 1080p video": {
+    "Is Ready?": {
       "main": [
         [
           {
-            "node": "Fetch generated video",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Switch": {
-      "main": [
-        [
-          {
-            "node": "Get 1080p video",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Loop Over Items",
+            "node": "Fetch Result",
             "type": "main",
             "index": 0
           }
@@ -155,6 +97,39 @@
         [
           {
             "node": "Wait 10s",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Result": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Generate request id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Upload output video",
             "type": "main",
             "index": 0
           }
@@ -176,13 +151,14 @@
         "formFields": {
           "values": [
             {
-              "fieldLabel": "Photos",
+              "fieldLabel": "Photo",
               "fieldType": "file",
+              "multipleFiles": false,
               "acceptFileTypes": ".jpg, .png, .jpeg",
               "requiredField": true
             },
             {
-              "fieldLabel": "Comment"
+              "fieldLabel": "Note"
             },
             {
               "fieldLabel": "Format",
@@ -198,6 +174,24 @@
                   }
                 ]
               }
+            },
+            {
+              "fieldLabel": "Duration",
+              "fieldType": "dropdown",
+              "defaultValue": "4s",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "4s"
+                  },
+                  {
+                    "option": "6s"
+                  },
+                  {
+                    "option": "8s"
+                  }
+                ]
+              }
             }
           ]
         },
@@ -207,24 +201,11 @@
       "typeVersion": 2.2,
       "position": [
         -368,
-        248
+        -248
       ],
       "id": "3017054b-6313-477a-9473-c8ce75385ad7",
       "name": "On form submission",
       "webhookId": "d16f6d5d-147e-4398-ab04-9277bea7fd2f"
-    },
-    {
-      "parameters": {
-        "options": {}
-      },
-      "type": "n8n-nodes-base.splitInBatches",
-      "typeVersion": 3,
-      "position": [
-        304,
-        248
-      ],
-      "id": "c5ef7a7c-61ee-495c-9968-1bd5a2bb1356",
-      "name": "Loop Over Items"
     },
     {
       "parameters": {
@@ -238,8 +219,8 @@
       "type": "n8n-nodes-base.s3",
       "typeVersion": 1,
       "position": [
-        2096,
-        56
+        1872,
+        -368
       ],
       "id": "63422c7d-57e1-43c5-839b-f40b0af62970",
       "name": "Upload output video",
@@ -255,7 +236,7 @@
         "operation": "upload",
         "bucketName": "afonsocraposo",
         "fileName": "=life-ai/input/{{ $('Filename').item.json.filenameImage }}",
-        "binaryPropertyName": "={{ $('Loop Over Items').item.binary.data}}",
+        "binaryPropertyName": "={{ $('Split Out').item.binary.Photo }}",
         "additionalFields": {
           "acl": "publicRead"
         }
@@ -263,8 +244,8 @@
       "type": "n8n-nodes-base.s3",
       "typeVersion": 1,
       "position": [
-        752,
-        -16
+        528,
+        -248
       ],
       "id": "14744101-29e8-442b-a88a-d05db49574d8",
       "name": "Upload input image",
@@ -278,14 +259,14 @@
     {
       "parameters": {
         "mode": "raw",
-        "jsonOutput": "={\n  \"filenameImage\": {{ $('Generate request id').item.json.requestId }}_{{ $json['index'] }}.{{$binary.data.fileExtension}},\n\"filename\": {{ $('Generate request id').item.json.requestId }}_{{ $json['index'] }}\n}\n",
+        "jsonOutput": "={\n  \"filenameImage\": {{ $('Generate request id').item.json.requestId }}.{{$('Split Out').item.binary.Photo.fileExtension}},\n\"filename\": {{ $('Generate request id').item.json.requestId }} }}\n}\n",
         "options": {}
       },
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        528,
-        -16
+        304,
+        -248
       ],
       "id": "ad2ad320-766a-43c7-b6b2-5ad689ab4fb5",
       "name": "Filename"
@@ -293,19 +274,28 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "https://veo3api.com/generate",
+        "url": "https://queue.fal.run/fal-ai/veo3.1/fast/image-to-video",
         "authentication": "genericCredentialType",
-        "genericAuthType": "httpBearerAuth",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"model\": \"veo3-fast\",\n  \"prompt\": \"Animate this photo in a lifelike and emotionally accurate way while strictly preserving the original photographic style and identity. The visual style of the image must remain unchanged throughout the entire video. Do not stylize, enhance, modernize, beautify, repaint, reinterpret, or artistically alter the image in any way. Preserve the original camera look, lens characteristics, depth of field, grain or noise, sharpness, contrast, color balance, lighting direction, shadows, and overall mood exactly as they appear in the source photo. All faces must remain an exact match to the original photo at all times. Do not alter facial structure, proportions, age, skin texture, or expressions beyond minimal, natural motion. If maintaining identity and style conflicts with motion realism, reduce or limit movement rather than changing appearance. Add only subtle, context-appropriate movement that fits the scene (for example: a wedding couple sharing a brief, gentle kiss, or family members expressing shared happiness through small smiles and eye movements). No new actions, people, poses, or background elements may be introduced. The animation should feel like the same photograph briefly coming to life — emotionally warm, joyful, and respectful — without any change in artistic or photographic style. Bear in mind that: {{ $('On form submission').item.json.Comment }}\",\n  \"image_urls\": [\"https://nbg1.your-objectstorage.com/afonsocraposo/life-ai/input/{{ $('Filename').item.json.filenameImage}}\"],\n  \"aspect_ratio\": \"{{ $('On form submission').item.json.Format }}\"\n}",
+        "jsonBody": "={\n  \"prompt\": \"Animate this image with subtle, realistic motion while preserving the subject’s identity, facial structure, age, clothing, and composition exactly as in the source image. Add minimal natural movement only: gentle blinking, soft breathing, slight head or posture movement. Expressions remain calm and neutral. Maintain the original lighting, color tones, and texture. Do not alter faces, do not add or remove elements, do not modernize. No exaggerated motion, no camera movement. The result should feel like a quiet moment briefly coming to life. Bear in mind that: {{ $('On form submission').item.json.Note }}\",\n  \"image_url\": \"https://nbg1.your-objectstorage.com/afonsocraposo/life-ai/input/{{ $('Filename').item.json.filenameImage}}\",\n  \"aspect_ratio\": \"{{ $('On form submission').item.json.Format }}\",\n  \"duration\": \"{{ $('On form submission').item.json.Duration }}\",\n  \"auto_fix\": true,\n  \"generate_audio\": false\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        976,
-        -16
+        752,
+        -248
       ],
       "id": "83b7c762-73d5-466f-9e40-c4129119adac",
       "name": "Generate video",
@@ -313,30 +303,25 @@
         "httpBearerAuth": {
           "id": "cTXAUUTqeDV0q5qf",
           "name": "veo3api"
+        },
+        "httpHeaderAuth": {
+          "id": "GIUCQjo21bBuPvug",
+          "name": "fal.ai"
         }
       }
     },
     {
       "parameters": {
-        "url": "https://veo3api.com/feed",
+        "url": "={{ $('Generate video').item.json.status_url }}",
         "authentication": "genericCredentialType",
-        "genericAuthType": "httpBearerAuth",
-        "sendQuery": true,
-        "queryParameters": {
-          "parameters": [
-            {
-              "name": "task_id",
-              "value": "={{ $('Generate video').item.json.data.task_id }}"
-            }
-          ]
-        },
+        "genericAuthType": "httpHeaderAuth",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        1200,
-        -16
+        976,
+        -248
       ],
       "id": "d147bf52-778c-41a6-9878-fb73dfd0169d",
       "name": "Check generation status",
@@ -344,35 +329,12 @@
         "httpBearerAuth": {
           "id": "cTXAUUTqeDV0q5qf",
           "name": "veo3api"
+        },
+        "httpHeaderAuth": {
+          "id": "GIUCQjo21bBuPvug",
+          "name": "fal.ai"
         }
       }
-    },
-    {
-      "parameters": {
-        "url": "={{ $json.data.result_url }}",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.3,
-      "position": [
-        1872,
-        -144
-      ],
-      "id": "852a0764-f763-4950-badd-c05ab5033e6c",
-      "name": "Fetch generated video"
-    },
-    {
-      "parameters": {
-        "jsCode": "const data = $input.first().json\nconst binaryData = $input.first().binary\n\nlet output = []\n\nObject.keys(binaryData).forEach( (b, index) => {\n  output.push({\n    json: {...data.Photos.at(index), index},\n    binary: { data: binaryData[b]}\n  })\n})\n\nreturn output"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        80,
-        248
-      ],
-      "id": "a8d139ec-069c-442a-92e6-f231e859320a",
-      "name": "Map videos from form"
     },
     {
       "parameters": {
@@ -382,8 +344,8 @@
       "type": "n8n-nodes-base.crypto",
       "typeVersion": 1,
       "position": [
-        -144,
-        248
+        80,
+        -248
       ],
       "id": "500639f1-b984-4c35-8dff-7a7556574df1",
       "name": "Generate request id"
@@ -395,8 +357,8 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        1648,
-        80
+        1424,
+        -152
       ],
       "id": "3181999d-8f6a-4a98-941e-bf99f0f79667",
       "name": "Wait 10s",
@@ -404,125 +366,87 @@
     },
     {
       "parameters": {
-        "url": "https://veo3api.com/get-1080p",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpBearerAuth",
-        "sendQuery": true,
-        "queryParameters": {
-          "parameters": [
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
             {
-              "name": "task_id",
-              "value": "={{ $('Generate video').item.json.data.task_id }}"
+              "id": "ac50759b-e2f3-4efd-a2af-f28b7d209b45",
+              "operator": {
+                "name": "filter.operator.equals",
+                "type": "string",
+                "operation": "equals"
+              },
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "COMPLETED"
             }
           ]
         },
+        "options": {}
+      },
+      "id": "687faf70-c89b-4809-ba4c-6415ad102df4",
+      "name": "Is Ready?",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        1200,
+        -320
+      ],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.response_url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "0b206585-30e0-4301-b9bf-a90a23e2da7b",
+      "name": "Fetch Result",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1424,
+        -368
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "GIUCQjo21bBuPvug",
+          "name": "fal.ai"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "$binary",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -144,
+        -248
+      ],
+      "id": "5d64251b-27c8-478e-ac54-efa4a2aaaae1",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.video.url }}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
         1648,
-        -144
+        -368
       ],
-      "id": "7594229c-671f-4a93-87c1-db8a62d86d06",
-      "name": "Get 1080p video",
-      "credentials": {
-        "httpBearerAuth": {
-          "id": "cTXAUUTqeDV0q5qf",
-          "name": "veo3api"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "rules": {
-          "values": [
-            {
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict",
-                  "version": 3
-                },
-                "conditions": [
-                  {
-                    "leftValue": "={{ $json.data.status }}",
-                    "rightValue": "COMPLETED",
-                    "operator": {
-                      "type": "string",
-                      "operation": "equals"
-                    },
-                    "id": "335eed46-726e-425c-9d96-dcc94256c432"
-                  }
-                ],
-                "combinator": "and"
-              },
-              "renameOutput": true,
-              "outputKey": "completed"
-            },
-            {
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict",
-                  "version": 3
-                },
-                "conditions": [
-                  {
-                    "id": "871d8729-40fa-4bf5-b395-10bad03f1880",
-                    "leftValue": "={{ $json.data.status }}",
-                    "rightValue": "FAILED",
-                    "operator": {
-                      "type": "string",
-                      "operation": "equals",
-                      "name": "filter.operator.equals"
-                    }
-                  }
-                ],
-                "combinator": "and"
-              },
-              "renameOutput": true,
-              "outputKey": "failed"
-            },
-            {
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict",
-                  "version": 3
-                },
-                "conditions": [
-                  {
-                    "id": "99dd64d6-f7dd-482a-831c-059b6084046e",
-                    "leftValue": "={{ $json.data.status }}",
-                    "rightValue": "IN_PROGRESS",
-                    "operator": {
-                      "type": "string",
-                      "operation": "equals",
-                      "name": "filter.operator.equals"
-                    }
-                  }
-                ],
-                "combinator": "and"
-              },
-              "renameOutput": true,
-              "outputKey": "in_progress"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.switch",
-      "typeVersion": 3.4,
-      "position": [
-        1424,
-        -112
-      ],
-      "id": "5f8cd551-9c44-49fe-9700-a9a1b5871b12",
-      "name": "Switch"
+      "id": "6803be0c-563f-4d3e-aaab-4dd1314069e8",
+      "name": "HTTP Request"
     }
   ],
   "pinData": {},
@@ -544,6 +468,6 @@
   "staticData": null,
   "tags": [],
   "triggerCount": 0,
-  "updatedAt": "2025-12-21T00:39:00.944Z",
-  "versionId": "d683f816-2f85-4c2c-a935-bd097e71041b"
+  "updatedAt": "2025-12-21T10:31:11.745Z",
+  "versionId": "6d2c2a0a-add5-4c73-a1d5-20f823d566fd"
 }
