@@ -1,0 +1,181 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2025-12-22T18:37:59.797Z",
+  "id": "awKd35uH8UswLaN8",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "Jobs worker",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "f7652ef5-b48c-4fc7-89f3-9ab55fac4c88",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE jobs\nSET\n  status = 'processing',\n  attempts = attempts + 1,\n  locked_at = now()\nWHERE id = (\n  SELECT id\n  FROM jobs\n  WHERE status = 'pending'\n    AND attempts < 5\n    AND (locked_at IS NULL OR locked_at < now() - interval '3 minutes')\n  ORDER BY created_at\n  LIMIT 1\n)\nRETURNING *;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        208,
+        0
+      ],
+      "id": "ce630ea1-d048-40e6-b244-f3a604065108",
+      "name": "Execute a SQL query",
+      "credentials": {
+        "postgres": {
+          "id": "I77jnnnjsqq857Pj",
+          "name": "Saudad (Dev)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json\nconst payload = JSON.parse(item.payload)\nconst result = {\n  ...item,\n  payload\n}\nreturn result"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        464,
+        0
+      ],
+      "id": "870beaef-8ff5-4db3-9fef-105419df1333",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.payload.type }}",
+                    "rightValue": "generate",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "fa5e8d64-0294-4398-817c-8756dfbb4fc9"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "generate"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "c9bffbdb-3b56-44f6-b1d8-a1714b2aef1d",
+                    "leftValue": "{{ $json.payload.type }}",
+                    "rightValue": "merge",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "merge"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        672,
+        0
+      ],
+      "id": "6181cb8f-9920-4e6f-8fce-cf29a72389c1",
+      "name": "Switch"
+    }
+  ],
+  "pinData": {},
+  "repo_name": "n8n-workflows",
+  "repo_owner": "afonsocraposo",
+  "repo_path": "",
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [
+    {
+      "updatedAt": "2025-12-22T18:37:59.800Z",
+      "createdAt": "2025-12-22T18:37:59.800Z",
+      "role": "workflow:owner",
+      "workflowId": "awKd35uH8UswLaN8",
+      "projectId": "fuqA7U1sSqEJpbZd"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2025-12-22T19:05:06.814Z",
+  "versionId": "0087a95b-f9fb-47b1-bc33-820b2b98bc9e"
+}
