@@ -35,6 +35,17 @@
           }
         ]
       ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Generate video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "createdAt": "2025-12-22T18:37:59.797Z",
@@ -59,7 +70,7 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "UPDATE jobs\nSET\n  status = 'processing',\n  attempts = attempts + 1,\n  locked_at = now()\nWHERE id = (\n  SELECT id\n  FROM jobs\n  WHERE status = 'pending'\n    AND attempts < 5\n    AND (locked_at IS NULL OR locked_at < now() - interval '3 minutes')\n  ORDER BY created_at\n  LIMIT 1\n)\nRETURNING *;",
+        "query": "UPDATE jobs\nSET\n  status = 'processing',\n  attempts = attempts + 1,\n  locked_at = now()\nWHERE id = (\n  SELECT id\n  FROM jobs\n  WHERE (status = 'pending' or (status = 'processing' and locked_at IS NULL OR locked_at < now() - interval '10 minutes'))\n    AND attempts < 5\n  ORDER BY created_at\n  LIMIT 1\n)\nRETURNING *;",
         "options": {}
       },
       "type": "n8n-nodes-base.postgres",
@@ -79,7 +90,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const item = $input.first().json\nconst payload = JSON.parse(item.payload)\nconst result = {\n  ...item,\n  payload\n}\nreturn result"
+        "jsCode": "const item = $input.first().json\nif(!item.payload){\n  return {\n    payload: {type:\"none\"}\n  }\n}\nconst payload = JSON.parse(item.payload)\nconst result = {\n  ...item,\n  payload\n}\nreturn result"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -155,6 +166,45 @@
       ],
       "id": "6181cb8f-9920-4e6f-8fce-cf29a72389c1",
       "name": "Switch"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://queue.fal.run/fal-ai/veo3.1/fast/image-to-video",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"prompt\": \"Animate this image with subtle, realistic motion while preserving the subject’s identity, facial structure, age, clothing, and composition exactly as in the source image. Add minimal natural movement only: gentle blinking, soft breathing, slight head or posture movement. Expressions remain calm and neutral. Maintain the original lighting, color tones, and texture. Do not alter faces, do not add or remove elements, do not modernize. No exaggerated motion, no camera movement. The result should feel like a quiet moment briefly coming to life. Bear in mind that: {{ $json.payload.note }}\",\n  \"image_url\": \"{{ $json.payload.url }}\",\n  \"aspect_ratio\": \"{{ $json.payload.aspect_ratio }}\",\n  \"duration\": 4,\n  \"auto_fix\": true,\n  \"generate_audio\": false\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1152,
+        -176
+      ],
+      "id": "117cd2f2-d3ee-417c-a3f8-9064c1511b6b",
+      "name": "Generate video",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "cTXAUUTqeDV0q5qf",
+          "name": "veo3api"
+        },
+        "httpHeaderAuth": {
+          "id": "GIUCQjo21bBuPvug",
+          "name": "fal.ai"
+        }
+      }
     }
   ],
   "pinData": {},
@@ -176,6 +226,6 @@
   "staticData": null,
   "tags": [],
   "triggerCount": 0,
-  "updatedAt": "2025-12-22T19:05:06.814Z",
-  "versionId": "0087a95b-f9fb-47b1-bc33-820b2b98bc9e"
+  "updatedAt": "2025-12-23T08:58:51.431Z",
+  "versionId": "e481dfad-9c9d-476a-b28d-a651b634439e"
 }
